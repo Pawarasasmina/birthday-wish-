@@ -186,6 +186,8 @@
   .gift-input { width: 100%; max-width: 320px; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,150,90,0.35); border-radius: 12px; padding: 10px 12px; color: #f7e7ce; font-family: 'Lato',sans-serif; }
   .gift-submit { border: none; border-radius: 999px; background: linear-gradient(135deg,#c9965a,#e8b4b8); color: #0a0818; padding: 10px 20px; cursor: pointer; font-weight: 700; letter-spacing: 0.04em; }
   .gift-submit:hover { transform: translateY(-1px); }
+  .gift-mobile-open { display: none; border: 1px solid rgba(201,150,90,0.45); background: rgba(201,150,90,0.14); color: #f7e7ce; border-radius: 999px; padding: 10px 14px; font-family: 'Lato',sans-serif; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; }
+  .gift-mobile-open:hover { background: rgba(201,150,90,0.24); }
   .gift-yn { display: flex; gap: 10px; flex-wrap: wrap; }
   .gift-yn button { border: 1px solid rgba(201,150,90,0.45); background: rgba(255,255,255,0.04); color: #f7e7ce; border-radius: 999px; padding: 9px 16px; cursor: pointer; }
   .gift-yn button:hover { background: rgba(201,150,90,0.15); }
@@ -199,6 +201,10 @@
   .gift-progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #c9965a 0%, #e8b4b8 50%, #f7e7ce 100%); box-shadow: 0 0 18px rgba(232,180,184,0.45); transition: width 0.45s ease; }
   .gift-burst { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 22px; }
   .gift-spark { position: absolute; left: 50%; top: 58%; width: 8px; height: 8px; border-radius: 2px; background: #f7e7ce; animation: giftSpark 0.9s cubic-bezier(.17,.84,.44,1) forwards; }
+  .gift-answer-modal { position: fixed; inset: 0; z-index: 135; display: flex; align-items: center; justify-content: center; background: rgba(6,6,18,0.76); padding: 16px; }
+  .gift-answer-modal-card { width: min(95vw, 440px); border: 1px solid rgba(201,150,90,0.35); border-radius: 18px; background: linear-gradient(155deg, rgba(18,13,38,0.96), rgba(10,8,24,0.98)); padding: 18px; position: relative; box-shadow: 0 22px 42px rgba(0,0,0,0.45); }
+  .gift-modal-close { position: absolute; top: 8px; right: 10px; border: none; background: transparent; color: rgba(247,231,206,0.82); font-size: 22px; line-height: 1; cursor: pointer; }
+  .gift-modal-close:hover { color: #f7e7ce; }
   @keyframes giftSpark {
     0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
     100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1); opacity: 0; }
@@ -278,6 +284,8 @@
     .gift-panel h3 { font-size: 1.25rem; }
     .gift-question { font-size: 1.05rem; line-height: 1.6; }
     .gift-step { font-size: 0.76rem; }
+    .gift-mobile-open { display: inline-block; width: 100%; max-width: 280px; }
+    #gift-answer-area, #gift-submit, #gift-feedback { display: none; }
     .gift-input { max-width: 100%; }
     .gift-submit { width: 100%; max-width: 220px; }
     .gift-yn button { flex: 1; min-width: 120px; }
@@ -468,12 +476,23 @@
         <h3>Answer To Unlock</h3>
         <p id="gift-step" class="gift-step"></p>
         <p id="gift-question" class="gift-question"></p>
+        <button id="gift-mobile-open" class="gift-mobile-open" type="button">Open Answer Popup</button>
         <div id="gift-answer-area" class="gift-answer-area"></div>
         <button id="gift-submit" class="gift-submit" type="button">Submit</button>
         <p id="gift-feedback" class="gift-feedback"></p>
       </div>
     </div>
   </section>
+  <div id="gift-answer-modal" class="gift-answer-modal hidden">
+    <div class="gift-answer-modal-card">
+      <button id="gift-modal-close" class="gift-modal-close" type="button" aria-label="Close">×</button>
+      <p id="gift-step-modal" class="gift-step"></p>
+      <p id="gift-question-modal" class="gift-question"></p>
+      <div id="gift-answer-area-modal" class="gift-answer-area"></div>
+      <button id="gift-submit-modal" class="gift-submit" type="button">Submit</button>
+      <p id="gift-feedback-modal" class="gift-feedback"></p>
+    </div>
+  </div>
   <button id="open-hidden-gifts" class="hidden-trigger-btn" type="button" aria-label="Open hidden gifts">✦</button>
 
   <!-- FINAL LOVE LETTER -->
@@ -606,6 +625,7 @@ let giftsRevealedCount = 0;
 let giftQuizReady = false;
 let latestUnlockedGiftIndex = -1;
 let unlockMusicStarted = false;
+const isGiftMobile = () => window.matchMedia('(max-width: 600px)').matches;
 
 // ================================================================
 // STAR FIELD
@@ -808,15 +828,32 @@ function renderGiftQuestion() {
   const answerArea = document.getElementById('gift-answer-area');
   const submitBtn = document.getElementById('gift-submit');
   const feedback = document.getElementById('gift-feedback');
-  if (!stepEl || !qEl || !answerArea || !submitBtn || !feedback) return;
+  const stepModal = document.getElementById('gift-step-modal');
+  const qModal = document.getElementById('gift-question-modal');
+  const answerAreaModal = document.getElementById('gift-answer-area-modal');
+  const submitBtnModal = document.getElementById('gift-submit-modal');
+  const feedbackModal = document.getElementById('gift-feedback-modal');
+  if (!stepEl || !qEl || !answerArea || !submitBtn || !feedback || !stepModal || !qModal || !answerAreaModal || !submitBtnModal || !feedbackModal) return;
 
   const question = GIFT_QUESTIONS[giftQuizIndex];
   stepEl.textContent = `Question ${giftQuizIndex + 1} of ${GIFT_QUESTIONS.length}`;
   qEl.textContent = question.prompt;
+  stepModal.textContent = stepEl.textContent;
+  qModal.textContent = question.prompt;
+
+  const useModal = isGiftMobile();
+  const activeAnswerArea = useModal ? answerAreaModal : answerArea;
+  const activeSubmitBtn = useModal ? submitBtnModal : submitBtn;
+  const activeFeedback = useModal ? feedbackModal : feedback;
+
   feedback.textContent = '';
+  feedbackModal.textContent = '';
   answerArea.innerHTML = '';
+  answerAreaModal.innerHTML = '';
   submitBtn.classList.add('hidden');
+  submitBtnModal.classList.add('hidden');
   submitBtn.onclick = null;
+  submitBtnModal.onclick = null;
 
   if (question.type === 'number' || question.type === 'text' || question.type === 'date') {
     const input = document.createElement('input');
@@ -832,9 +869,9 @@ function renderGiftQuestion() {
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') submitGiftAnswer();
     });
-    answerArea.appendChild(input);
-    submitBtn.classList.remove('hidden');
-    submitBtn.onclick = submitGiftAnswer;
+    activeAnswerArea.appendChild(input);
+    activeSubmitBtn.classList.remove('hidden');
+    activeSubmitBtn.onclick = submitGiftAnswer;
   }
 
   if (question.type === 'monthday') {
@@ -872,9 +909,9 @@ function renderGiftQuestion() {
 
     wrap.appendChild(month);
     wrap.appendChild(day);
-    answerArea.appendChild(wrap);
-    submitBtn.classList.remove('hidden');
-    submitBtn.onclick = submitGiftAnswer;
+    activeAnswerArea.appendChild(wrap);
+    activeSubmitBtn.classList.remove('hidden');
+    activeSubmitBtn.onclick = submitGiftAnswer;
   }
 
   if (question.type === 'yesno') {
@@ -890,7 +927,7 @@ function renderGiftQuestion() {
     noBtn.onclick = () => processGiftAnswer('no');
     wrap.appendChild(yesBtn);
     wrap.appendChild(noBtn);
-    answerArea.appendChild(wrap);
+    activeAnswerArea.appendChild(wrap);
   }
 
   if (question.type === 'range') {
@@ -912,16 +949,16 @@ function renderGiftQuestion() {
     };
     wrap.appendChild(range);
     wrap.appendChild(label);
-    answerArea.appendChild(wrap);
-    submitBtn.classList.remove('hidden');
-    submitBtn.onclick = submitGiftAnswer;
+    activeAnswerArea.appendChild(wrap);
+    activeSubmitBtn.classList.remove('hidden');
+    activeSubmitBtn.onclick = submitGiftAnswer;
   }
 
   if (question.type === 'final') {
     const note = document.createElement('p');
     note.className = 'gift-finish-note';
     note.textContent = 'This is surprise. This not reveal.';
-    answerArea.appendChild(note);
+    activeAnswerArea.appendChild(note);
     const finishBtn = document.createElement('button');
     finishBtn.type = 'button';
     finishBtn.className = 'gift-submit';
@@ -932,10 +969,11 @@ function renderGiftQuestion() {
       renderGiftList();
       runGiftUnlockBurst();
       playGiftRevealSound();
-      feedback.textContent = 'All done. Final surprise stays hidden.';
+      activeFeedback.textContent = 'All done. Final surprise stays hidden.';
       finishBtn.disabled = true;
+      if (useModal) document.getElementById('gift-answer-modal').classList.add('hidden');
     };
-    answerArea.appendChild(finishBtn);
+    activeAnswerArea.appendChild(finishBtn);
   }
 }
 
@@ -954,7 +992,7 @@ function submitGiftAnswer() {
 
 function processGiftAnswer(answerValue) {
   const question = GIFT_QUESTIONS[giftQuizIndex];
-  const feedback = document.getElementById('gift-feedback');
+  const feedback = isGiftMobile() ? document.getElementById('gift-feedback-modal') : document.getElementById('gift-feedback');
   if (!question || question.type === 'final' || !feedback) return;
 
   if (question.validate(answerValue)) {
@@ -969,6 +1007,7 @@ function processGiftAnswer(answerValue) {
       giftQuizIndex = Math.min(giftQuizIndex + 1, GIFT_QUESTIONS.length - 1);
       latestUnlockedGiftIndex = -1;
       feedback.style.color = '#e8b4b8';
+      if (isGiftMobile()) document.getElementById('gift-answer-modal').classList.add('hidden');
       renderGiftQuestion();
     }, 650);
   } else {
@@ -997,6 +1036,25 @@ function initGiftQuiz() {
       hunt.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
+
+  const mobileOpen = document.getElementById('gift-mobile-open');
+  const modal = document.getElementById('gift-answer-modal');
+  const modalClose = document.getElementById('gift-modal-close');
+  if (mobileOpen && modal) {
+    mobileOpen.addEventListener('click', () => {
+      if (!isGiftMobile()) return;
+      modal.classList.remove('hidden');
+    });
+  }
+  if (modalClose && modal) {
+    modalClose.addEventListener('click', () => modal.classList.add('hidden'));
+  }
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  }
+  window.addEventListener('resize', () => renderGiftQuestion());
 }
 
 // ================================================================
