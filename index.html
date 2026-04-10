@@ -167,9 +167,6 @@
   .gift-hunt { padding: 90px 24px; position: relative; }
   .gift-hunt::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 20%, rgba(201,150,90,0.15), transparent 42%), radial-gradient(ellipse at 80% 70%, rgba(232,180,184,0.12), transparent 46%); pointer-events: none; }
   .gift-hunt-inner { max-width: 1020px; margin: 0 auto; display: grid; gap: 26px; grid-template-columns: 1fr 1fr; position: relative; z-index: 1; }
-  .gift-mobile-tabs { display: none; }
-  .gift-mobile-tab { border: 1px solid rgba(201,150,90,0.42); background: rgba(255,255,255,0.04); color: #f7e7ce; border-radius: 999px; padding: 9px 14px; font-family: 'Lato',sans-serif; font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; }
-  .gift-mobile-tab.active { background: linear-gradient(135deg, rgba(201,150,90,0.28), rgba(232,180,184,0.25)); border-color: rgba(201,150,90,0.75); color: #fff6e6; }
   .gift-panel { position: relative; border: 1px solid rgba(201,150,90,0.3); background: linear-gradient(155deg, rgba(18,13,38,0.84), rgba(10,8,24,0.88)); border-radius: 22px; padding: 26px; box-shadow: 0 18px 45px rgba(0,0,0,0.35), inset 0 0 40px rgba(201,150,90,0.06); backdrop-filter: blur(5px); }
   .gift-panel h3 { font-size: 1.5rem; font-style: italic; color: #c9965a; margin-bottom: 14px; font-weight: 400; letter-spacing: 0.03em; }
   .gift-list { list-style: none; display: grid; gap: 12px; }
@@ -279,9 +276,6 @@
     .gift-teaser-text { font-size: 0.98rem; line-height: 1.7; }
     .gift-teaser-btn { width: 100%; max-width: 310px; font-size: 0.76rem; padding: 12px 14px; }
     .gift-panel h3 { font-size: 1.25rem; }
-    .gift-mobile-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .gift-mobile-tab { flex: 1; text-align: center; }
-    .gift-panel.mobile-hidden { display: none; }
     .gift-question { font-size: 1.05rem; line-height: 1.6; }
     .gift-step { font-size: 0.76rem; }
     .gift-input { max-width: 100%; }
@@ -459,11 +453,7 @@
 
   <section id="gift-hunt" class="gift-hunt hidden">
     <div class="gift-hunt-inner">
-      <div id="gift-mobile-tabs" class="gift-mobile-tabs">
-        <button id="gift-tab-board" class="gift-mobile-tab" type="button">Gift Board</button>
-        <button id="gift-tab-answer" class="gift-mobile-tab active" type="button">Answer</button>
-      </div>
-      <div id="gift-board-panel" class="gift-panel">
+      <div class="gift-panel">
         <h3>Gift Reveal Board</h3>
         <div class="gift-progress-wrap">
           <p class="gift-progress-label" id="gift-progress-label">Unlocked 0 of 9</p>
@@ -949,32 +939,6 @@ function renderGiftQuestion() {
   }
 }
 
-function isGiftMobileMode() {
-  return window.matchMedia('(max-width: 600px)').matches;
-}
-
-function setGiftMobileTab(tab) {
-  const boardPanel = document.getElementById('gift-board-panel');
-  const answerPanel = document.getElementById('gift-answer-panel');
-  const boardBtn = document.getElementById('gift-tab-board');
-  const answerBtn = document.getElementById('gift-tab-answer');
-  if (!boardPanel || !answerPanel || !boardBtn || !answerBtn) return;
-
-  if (!isGiftMobileMode()) {
-    boardPanel.classList.remove('mobile-hidden');
-    answerPanel.classList.remove('mobile-hidden');
-    boardBtn.classList.remove('active');
-    answerBtn.classList.remove('active');
-    return;
-  }
-
-  const showBoard = tab === 'board';
-  boardPanel.classList.toggle('mobile-hidden', !showBoard);
-  answerPanel.classList.toggle('mobile-hidden', showBoard);
-  boardBtn.classList.toggle('active', showBoard);
-  answerBtn.classList.toggle('active', !showBoard);
-}
-
 function submitGiftAnswer() {
   const input = document.getElementById('gift-answer-input');
   if (input) {
@@ -1033,14 +997,6 @@ function initGiftQuiz() {
       hunt.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
-
-  const tabBoard = document.getElementById('gift-tab-board');
-  const tabAnswer = document.getElementById('gift-tab-answer');
-  if (tabBoard) tabBoard.addEventListener('click', () => setGiftMobileTab('board'));
-  if (tabAnswer) tabAnswer.addEventListener('click', () => setGiftMobileTab('answer'));
-
-  setGiftMobileTab('answer');
-  window.addEventListener('resize', () => setGiftMobileTab('answer'));
 }
 
 // ================================================================
