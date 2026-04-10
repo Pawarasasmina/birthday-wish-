@@ -195,10 +195,83 @@
   .end-credit   { margin-top: 22px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247,231,206,0.45); }
 
   /* Responsive */
+  @media (max-width: 900px) {
+    .hero { min-height: 88vh; padding: 64px 20px; }
+    .story-section, .cards-section, .cake-section, .gift-teaser, .gift-hunt, .letter-section { padding-left: 20px; padding-right: 20px; }
+    .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .card-scene { height: 142px; }
+    .gift-hunt-inner { grid-template-columns: 1fr; gap: 18px; }
+    .gift-panel { padding: 20px; border-radius: 18px; }
+    .gift-burst { border-radius: 18px; }
+  }
+
   @media (max-width: 600px) {
-    .memory-row, .memory-row.reverse { flex-direction: column !important; }
-    .memory-text.right { text-align: left; }
-    .gift-hunt-inner { grid-template-columns: 1fr; }
+    .envelope { font-size: 58px; margin-bottom: 20px; }
+    .lock-h1 { letter-spacing: 0.07em; }
+    .lock-sub { font-size: 0.96rem; margin-bottom: 28px; text-align: center; padding: 0 8px; }
+    .lock-form { max-width: 94%; gap: 11px; }
+    #pw-input { font-size: 1rem; padding: 13px 18px; }
+    #unlock-btn { width: 100%; max-width: 260px; font-size: 1rem; padding: 12px 20px; }
+    #pw-error { text-align: center; line-height: 1.4; }
+    .made-with { bottom: 18px; font-size: 0.64rem; letter-spacing: 0.08em; }
+
+    .hero { min-height: 80vh; padding: 56px 16px 42px; }
+    .hero-cake { font-size: 62px; margin-bottom: 16px; }
+    .hero-small { letter-spacing: 0.2em; font-size: 0.78rem; }
+    .hero-big { line-height: 0.95; margin-bottom: 10px; }
+    .hero-name { letter-spacing: 0.1em; }
+    .hero-scroll { margin-top: 22px; font-size: 0.9rem; }
+
+    .divider { gap: 12px; padding: 0 16px; }
+    .story-section, .cards-section, .cake-section, .gift-teaser, .gift-hunt, .letter-section { padding-top: 56px; padding-bottom: 56px; padding-left: 16px; padding-right: 16px; }
+    .section-title { margin-bottom: 34px; }
+    .memory-row, .memory-row.reverse { flex-direction: column !important; gap: 16px; }
+    .memory-text, .memory-text.right { text-align: left; min-width: 100%; }
+    .memory-quote { line-height: 1.7; font-size: 0.98rem; }
+    .photo-box { min-width: 100%; border-radius: 14px; }
+    .photo-reveal-hint { font-size: 0.69rem; letter-spacing: 0.06em; }
+
+    .cards-header { margin-bottom: 30px; }
+    .cards-grid { grid-template-columns: 1fr; gap: 12px; }
+    .card-scene { height: 136px; }
+    .card-back { font-size: 0.86rem; line-height: 1.55; padding: 16px; }
+
+    .cake-hint { margin-bottom: 34px; }
+    .candles-row { gap: 11px; }
+    .candle-wax { width: 12px; height: 40px; }
+    .candle-flame { font-size: 19px; }
+    .tier-top { width: 128px; height: 36px; font-size: 0.63rem; }
+    .tier-mid { width: 172px; height: 41px; font-size: 1.02rem; }
+    .tier-bot { width: 222px; height: 45px; font-size: 0.9rem; }
+    .tier-plate { width: 244px; }
+    #wish-msg { margin-top: 20px; font-size: 1.2rem; }
+
+    .gift-teaser-text { font-size: 0.98rem; line-height: 1.7; }
+    .gift-teaser-btn { width: 100%; max-width: 310px; font-size: 0.76rem; padding: 12px 14px; }
+    .gift-panel h3 { font-size: 1.25rem; }
+    .gift-question { font-size: 1.05rem; line-height: 1.6; }
+    .gift-step { font-size: 0.76rem; }
+    .gift-input { max-width: 100%; }
+    .gift-submit { width: 100%; max-width: 220px; }
+    .gift-yn button { flex: 1; min-width: 120px; }
+    .hidden-trigger-btn { right: 10px; bottom: 12px; width: 34px; height: 34px; font-size: 13px; opacity: 0.28; }
+
+    .letter-env { font-size: 44px; margin-bottom: 20px; }
+    .letter-title { margin-bottom: 22px; }
+    .letter-body { font-size: 0.96rem; line-height: 1.8; }
+    .letter-body p { margin-bottom: 16px; }
+    .letter-sig { margin-top: 26px; padding-top: 20px; }
+  }
+
+  @media (max-width: 380px) {
+    .hero-small { letter-spacing: 0.16em; }
+    #unlock-btn { max-width: 100%; }
+    .gift-submit { max-width: 100%; }
+    .gift-yn button { min-width: 100px; padding: 9px 10px; }
+    .tier-top { width: 118px; }
+    .tier-mid { width: 160px; }
+    .tier-bot { width: 206px; }
+    .tier-plate { width: 226px; }
   }
 </style>
 </head>
@@ -420,12 +493,11 @@ const GIFT_WORDS = [
   'Painting kit',
   'Gift box',
   'Perfume + body lotion',
-  'Bike seat cover',
   'Surprise gift'
 ];
 const GIFT_QUESTIONS = [
   {
-    prompt: 'WHATS OUR ANIVERSARY DATE? (ask only date)',
+    prompt: 'WHATS OUR ANIVERSARY DATE? (only date)',
     type: 'number',
     placeholder: 'Enter date',
     validate: value => value === '27' || value === '28',
@@ -433,11 +505,8 @@ const GIFT_QUESTIONS = [
   },
   {
     prompt: 'Whats my birthday? (month and date)',
-    type: 'date',
-    validate: value => {
-      const parts = String(value).split('-');
-      return parts.length === 3 && parts[1] === '12' && parts[2] === '23';
-    },
+    type: 'monthday',
+    validate: value => value === '12-23',
     wrong: 'Wrong. Pick month and date correctly.'
   },
   {
@@ -457,7 +526,7 @@ const GIFT_QUESTIONS = [
     type: 'range',
     min: 0,
     max: 100,
-    start: 50,
+    start: 20,
     validate: value => Number(value) === 100,
     wrong: 'Push it to maximum.'
   },
@@ -472,16 +541,6 @@ const GIFT_QUESTIONS = [
     type: 'yesno',
     validate: value => value === 'yes',
     wrong: 'Wrong answer.'
-  },
-  {
-    prompt: "Whats your motor bike's current need?",
-    type: 'text',
-    placeholder: 'Type answer',
-    validate: value => {
-      const normalized = String(value).trim().toLowerCase().replace(/\s+/g, ' ');
-      return normalized === 'seat cover' || normalized === 'bike seat cover';
-    },
-    wrong: 'Hint: it is for your bike seat.'
   },
   {
     prompt: 'Final question',
@@ -679,6 +738,46 @@ function renderGiftQuestion() {
     submitBtn.onclick = submitGiftAnswer;
   }
 
+  if (question.type === 'monthday') {
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.gap = '10px';
+    wrap.style.flexWrap = 'wrap';
+
+    const month = document.createElement('select');
+    month.id = 'gift-answer-month';
+    month.className = 'gift-input';
+    month.style.maxWidth = '180px';
+    const monthNames = ['Month', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    monthNames.forEach((name, idx) => {
+      const opt = document.createElement('option');
+      opt.value = idx === 0 ? '' : String(idx).padStart(2, '0');
+      opt.textContent = name;
+      month.appendChild(opt);
+    });
+
+    const day = document.createElement('select');
+    day.id = 'gift-answer-day';
+    day.className = 'gift-input';
+    day.style.maxWidth = '140px';
+    const dayPlaceholder = document.createElement('option');
+    dayPlaceholder.value = '';
+    dayPlaceholder.textContent = 'Date';
+    day.appendChild(dayPlaceholder);
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = String(d).padStart(2, '0');
+      opt.textContent = String(d);
+      day.appendChild(opt);
+    }
+
+    wrap.appendChild(month);
+    wrap.appendChild(day);
+    answerArea.appendChild(wrap);
+    submitBtn.classList.remove('hidden');
+    submitBtn.onclick = submitGiftAnswer;
+  }
+
   if (question.type === 'yesno') {
     const wrap = document.createElement('div');
     wrap.className = 'gift-yn';
@@ -742,8 +841,15 @@ function renderGiftQuestion() {
 
 function submitGiftAnswer() {
   const input = document.getElementById('gift-answer-input');
-  if (!input) return;
-  processGiftAnswer(input.value);
+  if (input) {
+    processGiftAnswer(input.value);
+    return;
+  }
+  const month = document.getElementById('gift-answer-month');
+  const day = document.getElementById('gift-answer-day');
+  if (month && day) {
+    processGiftAnswer(`${month.value}-${day.value}`);
+  }
 }
 
 function processGiftAnswer(answerValue) {
